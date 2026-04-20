@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node server.js",
+    "start": "next start",
     "lint": "eslint",
     "tailwind:init": "node node_modules/tailwindcss/dist/cli.js init -p",
     "db:migrate": "prisma migrate dev",
