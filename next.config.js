@@ -11,3 +11,6 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+module.exports = {
+  output: 'standalone',  // Indispensable pour Railway
+}
