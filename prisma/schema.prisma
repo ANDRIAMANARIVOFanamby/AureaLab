@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Booking {
+  id           Int      @id @default(autoincrement())
+  nom          String
+  email        String
+  telephone    String
+  prestation   String
+  disponibilite String?
+  message      String?
+  createdAt    DateTime @default(now())
+  status       String   @default("en_attente")
+  
+  @@map("bookings")
+}
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  email     String
+  telephone String?
+  sujet     String
+  message   String
+  createdAt DateTime @default(now())
+  status    String   @default("non_lu")
+  replied   Boolean  @default(false)  
+  repliedAt DateTime?                  
+  
+  @@map("contacts")
+}
+
+model RendezVous {
+  id           Int      @id @default(autoincrement())
+  bookingId    Int
+  nom          String
+  email        String
+  telephone    String
+  prestation   String
+  date         DateTime
+  duree        Int      // durée en minutes
+  status       String   @default("confirme")
+  createdAt    DateTime @default(now())
+  
+  @@map("rendez_vous")
+}
+
+model Gallery {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  image       String
+  category    String   // "cil-a-cil", "hybride", "volume-bresilien", "megavolume"
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("gallery")
+}
