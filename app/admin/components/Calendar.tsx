@@ -159,7 +159,7 @@ export default function Calendar({ onSelectSlot, selectedDate, selectedTime, pre
         <button onClick={prevMonth} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#D4AF37' }}>
           ←
         </button>
-        <h3 style={{ margin: 0, fontFamily: "'Playfair Display', serif" }}>
+        <h3 style={{ margin: 0}}>
           {currentMonth.toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
         </h3>
         <button onClick={nextMonth} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#D4AF37' }}>

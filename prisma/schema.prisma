@@ -8,46 +8,46 @@ datasource db {
 }
 
 model Booking {
-  id           Int      @id @default(autoincrement())
-  nom          String
-  email        String
-  telephone    String
-  prestation   String
+  id            Int      @id @default(autoincrement())
+  nom           String
+  email         String
+  telephone     String
+  prestation    String
   disponibilite String?
-  message      String?
-  createdAt    DateTime @default(now())
-  status       String   @default("en_attente")
-  
+  message       String?
+  createdAt     DateTime @default(now())
+  status        String   @default("en_attente")
+
   @@map("bookings")
 }
 
 model Contact {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   nom       String
   email     String
   telephone String?
   sujet     String
   message   String
-  createdAt DateTime @default(now())
-  status    String   @default("non_lu")
-  replied   Boolean  @default(false)  
-  repliedAt DateTime?                  
-  
+  createdAt DateTime  @default(now())
+  status    String    @default("non_lu")
+  replied   Boolean   @default(false)
+  repliedAt DateTime?
+
   @@map("contacts")
 }
 
 model RendezVous {
-  id           Int      @id @default(autoincrement())
-  bookingId    Int
-  nom          String
-  email        String
-  telephone    String
-  prestation   String
-  date         DateTime
-  duree        Int      // durée en minutes
-  status       String   @default("confirme")
-  createdAt    DateTime @default(now())
-  
+  id         Int      @id @default(autoincrement())
+  bookingId  Int
+  nom        String
+  email      String
+  telephone  String
+  prestation String
+  date       DateTime
+  duree      Int
+  status     String   @default("confirme")
+  createdAt  DateTime @default(now())
+
   @@map("rendez_vous")
 }
 
@@ -56,10 +56,68 @@ model Gallery {
   title       String
   description String?
   image       String
-  category    String   // "cil-a-cil", "hybride", "volume-bresilien", "megavolume"
+  category    String
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@map("gallery")
+}
+
+model Content {
+  id        String   @id @default(cuid())
+  page      String
+  section   String
+  key       String
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@unique([page, section, key])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  services    Service[]
+
+  @@map("categories")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       String
+  image       String
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  @@map("services")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  excerpt   String?  // Court résumé pour la liste des articles
+  content   String   @db.Text  // Contenu HTML ou Markdown
+  image     String?  // URL de l'image de couverture
+  author    String   @default("AUREA Lab")
+  published Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("posts")
 }

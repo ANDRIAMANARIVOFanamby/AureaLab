@@ -71,6 +71,7 @@ export default function AdminContacts() {
   }
 
   const openDetailsModal = (contact: Contact) => {
+    console.log("Clic sur:", contact.nom)  // ← Ajoute cette ligne
     setSelectedContact(contact)
     setReplySubject(`Re: ${getSujetLabel(contact.sujet)} - ${contact.nom}`)
     setReplyMessage('')
@@ -155,7 +156,7 @@ export default function AdminContacts() {
   return (
     <div style={{ minHeight: '100vh', background: '#FDFBF7' }}>
       <div style={{ background: '#1A1A1A', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ fontFamily: "'Playfair Display', serif", color: '#D4AF37' }}>Messages de contact</h1>
+        <h1 style={{ color: '#D4AF37' }}>Messages de contact</h1>
         <Link href="/admin" style={{ color: '#D4AF37', textDecoration: 'none' }}>← Retour</Link>
       </div>
 
@@ -296,8 +297,217 @@ export default function AdminContacts() {
         </div>
       </div>
 
-      {/* Modals (inchangés) */}
-      {/* ... reste des modals ... */}
+            {/* Modal des détails du message */}
+      {showDetailsModal && selectedContact && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          overflowY: 'auto',
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '1rem',
+            width: '100%',
+            maxWidth: '600px',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <h2 style={{ color: '#D4AF37', marginBottom: '1rem' }}>Détails du message</h2>
+            
+            <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f5f5f5', borderRadius: '0.5rem' }}>
+              <p><strong>👤 Nom :</strong> {selectedContact.nom}</p>
+              <p><strong>📧 Email :</strong> {selectedContact.email}</p>
+              {selectedContact.telephone && (
+                <p><strong>📱 Téléphone :</strong> {selectedContact.telephone}</p>
+              )}
+              <p><strong>📋 Sujet :</strong> {getSujetLabel(selectedContact.sujet)}</p>
+              <p><strong>📅 Date :</strong> {formatDate(selectedContact.createdAt)}</p>
+              <p><strong>📬 Statut :</strong> 
+                <span style={{ 
+                  marginLeft: '0.5rem',
+                  padding: '0.25rem 0.5rem', 
+                  borderRadius: '0.25rem',
+                  background: selectedContact.replied ? '#4CAF50' : '#FF9800',
+                  color: 'white',
+                  fontSize: '0.75rem'
+                }}>
+                  {selectedContact.replied ? '✅ Répondu' : '⏳ En attente de réponse'}
+                </span>
+              </p>
+              {selectedContact.repliedAt && (
+                <p><strong>📅 Répondu le :</strong> {formatDate(selectedContact.repliedAt)}</p>
+              )}
+              <p><strong>💬 Message :</strong></p>
+              <div style={{ 
+                background: 'white', 
+                padding: '1rem', 
+                borderRadius: '0.5rem', 
+                marginTop: '0.5rem',
+                border: '1px solid #eee',
+                whiteSpace: 'pre-wrap'
+              }}>
+                {selectedContact.message}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button
+                onClick={openReplyModal}
+                style={{
+                  flex: 1,
+                  background: '#4CAF50',
+                  color: 'white',
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer'
+                }}
+              >
+                ✉️ Répondre
+              </button>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                style={{
+                  flex: 1,
+                  background: '#999',
+                  color: 'white',
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de réponse */}
+      {showReplyModal && selectedContact && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          overflowY: 'auto',
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '1rem',
+            width: '100%',
+            maxWidth: '600px'
+          }}>
+            <h2 style={{ color: '#D4AF37', marginBottom: '1rem' }}>
+              Répondre à {selectedContact.nom}
+            </h2>
+            
+            {selectedContact.replied && (
+              <div style={{ 
+                marginBottom: '1rem', 
+                padding: '0.75rem', 
+                background: '#e3f2fd', 
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem'
+              }}>
+                ℹ️ Ce message a déjà reçu une réponse. Vous allez envoyer une nouvelle réponse.
+              </div>
+            )}
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Objet</label>
+              <input
+                type="text"
+                value={replySubject}
+                onChange={(e) => setReplySubject(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.5rem',
+                  fontSize: '1rem'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Message</label>
+              <textarea
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                rows={8}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.5rem',
+                  fontSize: '1rem',
+                  resize: 'vertical'
+                }}
+                placeholder="Votre réponse..."
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem', padding: '0.75rem', background: '#f5f5f5', borderRadius: '0.5rem' }}>
+              <p style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>
+                <strong>📧 Envoyé à :</strong> {selectedContact.email}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button
+                onClick={handleSendReply}
+                disabled={sending || !replyMessage}
+                style={{
+                  flex: 1,
+                  background: '#4CAF50',
+                  color: 'white',
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: sending || !replyMessage ? 'not-allowed' : 'pointer',
+                  opacity: sending || !replyMessage ? 0.6 : 1
+                }}
+              >
+                {sending ? '⏳ Envoi en cours...' : '✉️ Envoyer la réponse'}
+              </button>
+              <button
+                onClick={() => setShowReplyModal(false)}
+                style={{
+                  flex: 1,
+                  background: '#999',
+                  color: 'white',
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

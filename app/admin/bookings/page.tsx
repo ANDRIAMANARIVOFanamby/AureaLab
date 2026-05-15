@@ -99,7 +99,7 @@ export default function AdminBookings() {
 
   const handleDelete = async (id: number) => {
     if (confirm('Supprimer cette inscription ?')) {
-      await fetch(`/admin/api/bookings?id=${id}`, { method: 'DELETE' })
+      await fetch(`/admin/api/admin-bookings?id=${id}`, { method: 'DELETE' })
       fetchBookings()
     }
   }
@@ -194,7 +194,7 @@ export default function AdminBookings() {
   return (
     <div style={{ minHeight: '100vh', background: '#FDFBF7' }}>
       <div style={{ background: '#1A1A1A', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ fontFamily: "'Playfair Display', serif", color: '#D4AF37' }}>Inscriptions</h1>
+        <h1 style={{ color: '#D4AF37' }}>Inscriptions</h1>
         <Link href="/admin" style={{ color: '#D4AF37', textDecoration: 'none' }}>← Retour</Link>
       </div>
 
@@ -356,8 +356,136 @@ export default function AdminBookings() {
         </div>
       </div>
 
-      {/* Modals (inchangés) */}
-      {/* ... reste des modals ... */}
+            {/* Modal de validation avec calendrier */}
+      {showModal && selectedBooking && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          overflowY: 'auto',
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '1rem',
+            width: '100%',
+            maxWidth: '800px',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <h2 style={{ color: '#D4AF37', marginBottom: '1rem' }}>Valider l'inscription</h2>
+            
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f5f5f5', borderRadius: '0.5rem' }}>
+              <p><strong>👤 Client :</strong> {selectedBooking.nom}</p>
+              <p><strong>📧 Email :</strong> {selectedBooking.email}</p>
+              <p><strong>📱 Téléphone :</strong> {selectedBooking.telephone}</p>
+              <p><strong>💎 Prestation :</strong> {selectedBooking.prestation}</p>
+              <p><strong>⏱️ Durée :</strong> {selectedDuree} minutes</p>
+              {selectedBooking.disponibilite && (
+                <p><strong>📅 Disponibilité :</strong> {selectedBooking.disponibilite}</p>
+              )}
+            </div>
+
+            <Calendar 
+              onSelectSlot={handleSelectSlot}
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              prestationDuree={selectedDuree}
+            />
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button
+                onClick={handleValidate}
+                disabled={isValidating || !selectedDate}
+                style={{
+                  flex: 1,
+                  background: '#4CAF50',
+                  color: 'white',
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: isValidating || !selectedDate ? 'not-allowed' : 'pointer',
+                  opacity: isValidating || !selectedDate ? 0.6 : 1
+                }}
+              >
+                {isValidating ? '⏳ Création en cours...' : '✅ Confirmer le rendez-vous'}
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  flex: 1,
+                  background: '#999',
+                  color: 'white',
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal des détails du rendez-vous */}
+      {showDetailsModal && selectedRendezVous && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '1rem',
+            width: '100%',
+            maxWidth: '500px'
+          }}>
+            <h2 style={{ color: '#D4AF37', marginBottom: '1rem' }}>Détails du rendez-vous</h2>
+            
+            <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f5f5f5', borderRadius: '0.5rem' }}>
+              <p><strong>👤 Client :</strong> {selectedRendezVous.nom}</p>
+              <p><strong>📧 Email :</strong> {selectedRendezVous.email}</p>
+              <p><strong>📱 Téléphone :</strong> {selectedRendezVous.telephone}</p>
+              <p><strong>💎 Prestation :</strong> {selectedRendezVous.prestation}</p>
+              <p><strong>📅 Date :</strong> {formatDateTime(selectedRendezVous.date)}</p>
+              <p><strong>⏱️ Durée :</strong> {selectedRendezVous.duree} minutes</p>
+            </div>
+
+            <button
+              onClick={() => setShowDetailsModal(false)}
+              style={{
+                width: '100%',
+                background: '#D4AF37',
+                color: '#1A1A1A',
+                padding: '0.75rem',
+                border: 'none',
+                borderRadius: '0.5rem',
+                cursor: 'pointer'
+              }}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

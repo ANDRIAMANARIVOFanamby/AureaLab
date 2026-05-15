@@ -1,12 +1,48 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import Image from 'next/image'
+import ScrollArrow from '@/components/ScrollArrow'
+
+interface Service {
+  id: string
+  name: string
+  price: string
+  isActive: boolean
+}
+
+interface Slide {
+  id: number
+  image: string
+  title: string
+  subtitle: string
+}
+
+// Slides du carrousel pour la page Réservation
+const slides: Slide[] = [
+  {
+    id: 1,
+    image: 'https://res.cloudinary.com/degalhtre/image/upload/v1777295098/hero-booking-bg_qhquhh.jpg',
+    title: 'Réservation',
+    subtitle: 'AUREA Lab ouvrira bientôt ses portes. Rejoignez notre liste d\'attente',
+  },
+  {
+    id: 2,
+    image: 'https://res.cloudinary.com/degalhtre/image/upload/v1778143227/compressedImage_2_yxvbo5.jpg',
+    title: 'Réserver votre prestation',
+    subtitle: 'Soyez parmi les premières à découvrir l\'excellence d\'AUREA Lab',
+  },
+]
 
 export default function Booking() {
+  const [services, setServices] = useState<Service[]>([])
+  const [loadingServices, setLoadingServices] = useState(true)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isTransitioning, setIsTransitioning] = useState(false)
   const [formData, setFormData] = useState({
     nom: '',
     email: '',
@@ -20,14 +56,42 @@ export default function Booking() {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
-  const prestations = [
-    { value: '', label: 'Choisissez une prestation' },
-    { value: 'cil-a-cil', label: 'Cil à cil - 60 000 Ar' },
-    { value: 'hybride', label: 'Hybride - 70 000 Ar' },
-    { value: 'volume-bresilien', label: 'Volume Brésilien - 80 000 Ar' },
-    { value: 'megavolume', label: 'Mégavolume - 100 000 Ar' },
-    { value: 'non-sure', label: 'Je ne sais pas encore' }
-  ]
+  // Charger les prestations dynamiquement
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await fetch('/admin/api/services')
+        const data = await res.json()
+        const activeServices = data.filter((s: Service) => s.isActive === true)
+        setServices(activeServices)
+      } catch (error) {
+        console.error('Erreur chargement prestations:', error)
+      } finally {
+        setLoadingServices(false)
+      }
+    }
+    fetchServices()
+  }, [])
+
+  // Défilement automatique
+  useEffect(() => {
+    if (slides.length <= 1) return
+    
+    const interval = setInterval(() => {
+      setIsTransitioning(true)
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+      setTimeout(() => setIsTransitioning(false), 1000)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const goToSlide = (index: number) => {
+    if (index === currentSlide) return
+    if (index < 0 || index >= slides.length) return
+    setIsTransitioning(true)
+    setCurrentSlide(index)
+    setTimeout(() => setIsTransitioning(false), 1000)
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -120,19 +184,83 @@ export default function Booking() {
       <Header />
       <main>
         
-        {/* Section Réservation */}
+        {/* Section Réservation avec slider */}
+        <div className="booking-hero" style={{ height: '100vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          
+          {/* Slides - Images de fond */}
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 0,
+                opacity: index === currentSlide ? 1 : 0,
+                transition: 'opacity 800ms ease-in-out',
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                <Image 
+                  src={slide.image} 
+                  alt="AUREA Lab"
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                />
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)' }}></div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Contenu */}
+          <div 
+            style={{ 
+              position: 'relative', 
+              zIndex: 10, 
+              maxWidth: '1200px', 
+              margin: '0 auto', 
+              padding: '0 1.5rem', 
+              textAlign: 'center', 
+              width: '100%',
+              opacity: isTransitioning ? 0.7 : 1,
+              transition: 'opacity 300ms ease-in-out',
+            }}
+          >
+            <h1 
+              key={`title-${currentSlide}`}
+              style={{ 
+                animation: 'fadeInUp 0.5s ease-out',
+              }}
+            >
+              {slides[currentSlide].title}
+            </h1>
+            <div 
+              key={`divider-${currentSlide}`}
+              className="booking-divider"
+              style={{ 
+                animation: 'fadeInUp 0.5s ease-out 0.1s both',
+              }}
+            ></div>
+            <p 
+              key={`subtitle-${currentSlide}`}
+              style={{ 
+                animation: 'fadeInUp 0.5s ease-out 0.2s both',
+              }}
+            >
+              {slides[currentSlide].subtitle}
+            </p>
+            <div style={{ position: 'absolute', bottom: '2rem', right: '2rem', zIndex: 20 }}>
+              <ScrollArrow />
+            </div>
+          </div>
+          
+        </div>
+
         <section className="booking-page">
           <div className="booking-container">
-            
-            {/* Hero */}
-            <div className="booking-hero">
-              <h1>Réservation</h1>
-              <div className="booking-divider"></div>
-              <p>
-                AUREA Lab ouvrira bientôt ses portes. Vous pouvez dès maintenant rejoindre 
-                la liste d'attente pour être parmi les premières clientes informées de l'ouverture.
-              </p>
-            </div>
 
             {/* Formulaire */}
             <div className="booking-form-wrapper">
@@ -201,24 +329,32 @@ export default function Booking() {
                   </div>
                 </div>
 
-                {/* Prestation */}
+                {/* Prestation - DYNAMIQUE */}
                 <div className="form-group">
                   <label className="form-label">
                     Prestation souhaitée <span>*</span>
                   </label>
-                  <select
-                    name="prestation"
-                    value={formData.prestation}
-                    onChange={handleChange}
-                    required
-                    className="form-select"
-                  >
-                    {prestations.map((p) => (
-                      <option key={p.value} value={p.value}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
+                  {loadingServices ? (
+                    <div className="form-input" style={{ background: '#f5f5f5' }}>
+                      Chargement des prestations...
+                    </div>
+                  ) : (
+                    <select
+                      name="prestation"
+                      value={formData.prestation}
+                      onChange={handleChange}
+                      required
+                      className="form-select"
+                    >
+                      <option value="">Choisissez une prestation</option>
+                      {services.map((service) => (
+                        <option key={service.id} value={service.id}>
+                          {service.name} - {service.price}
+                        </option>
+                      ))}
+                      <option value="non-sure">Je ne sais pas encore</option>
+                    </select>
+                  )}
                 </div>
 
                 {/* Disponibilité */}
@@ -330,6 +466,20 @@ export default function Booking() {
       </main>
       <Footer />
       <WhatsAppButton />
+
+      {/* Animation CSS */}
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </>
   )
 }

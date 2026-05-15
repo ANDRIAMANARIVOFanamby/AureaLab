@@ -192,7 +192,7 @@ export default function AdminGallery() {
     <div style={{ minHeight: '100vh', background: '#FDFBF7' }}>
       {/* Header */}
       <div style={{ background: '#1A1A1A', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ fontFamily: "'Playfair Display', serif", color: '#D4AF37' }}>Galerie</h1>
+        <h1 style={{ color: '#D4AF37' }}>Galerie</h1>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <button
             onClick={() => setShowModal(true)}

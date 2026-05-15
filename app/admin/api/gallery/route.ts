@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { writeFile, unlink } from 'fs/promises'
-import path from 'path'
+import { v2 as cloudinary } from 'cloudinary'
 
 const prisma = new PrismaClient()
+
+// Configuration Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 // GET - Récupérer toutes les images
 export async function GET() {
@@ -17,7 +23,7 @@ export async function GET() {
   }
 }
 
-// POST - Ajouter une image
+// POST - Ajouter une image sur Cloudinary
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -30,20 +36,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Champs manquants' }, { status: 400 })
     }
 
-    // Sauvegarder l'image
+    // Upload vers Cloudinary
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    const filename = `${Date.now()}-${file.name}`
-    const filepath = path.join(process.cwd(), 'public', 'gallery', filename)
     
-    await writeFile(filepath, buffer)
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: 'aurea-gallery',
+          transformation: [
+            { width: 800, height: 800, crop: 'limit' },
+            { quality: 'auto' }
+          ]
+        },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result)
+        }
+      ).end(buffer)
+    })
 
-    // Sauvegarder en base
+    // Sauvegarde en base
     const gallery = await prisma.gallery.create({
       data: {
         title,
         description: description || '',
-        image: `/gallery/${filename}`,
+        image: uploadResult.secure_url,
         category,
         order: await getNextOrder()
       }
@@ -73,7 +91,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE - Supprimer une image
+// DELETE - Supprimer une image (de Cloudinary aussi)
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -81,14 +99,13 @@ export async function DELETE(request: NextRequest) {
 
     const gallery = await prisma.gallery.findUnique({ where: { id } })
     if (gallery) {
-      // Supprimer le fichier
-      const filepath = path.join(process.cwd(), 'public', gallery.image)
-      try {
-        await unlink(filepath)
-      } catch (e) {
-        console.error('Erreur suppression fichier:', e)
-      }
+      // Extraire le public_id de l'URL Cloudinary
+      const publicId = gallery.image.split('/').slice(-2).join('/').split('.')[0]
       
+      // Supprimer de Cloudinary
+      await cloudinary.uploader.destroy(publicId)
+      
+      // Supprimer de la base
       await prisma.gallery.delete({ where: { id } })
     }
 

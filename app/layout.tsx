@@ -31,12 +31,115 @@
 //     </html>
 //   );
 // }
+// import type { Metadata } from 'next'
+// import './globals.css'
+
+// export const metadata: Metadata = {
+//   title: 'AUREA Lab – Extensions de cils haut de gamme | Ouverture bientôt',
+//   description: 'AUREA Lab est un futur studio spécialisé dans les extensions de cils haut de gamme à Antananarivo. Ouverture bientôt – rejoignez la liste d\'attente.',
+// }
+
+// export default function RootLayout({
+//   children,
+// }: {
+//   children: React.ReactNode
+// }) {
+//   return (
+//     <html lang="fr">
+//       <body>{children}</body>
+//     </html>
+//   )
+// }
+
+// import type { Metadata } from 'next'
+// import './globals.css'
+// import { Space_Grotesk } from 'next/font/google'
+
+// const spaceGrotesk = Space_Grotesk({ 
+//   subsets: ['latin'],
+//   weight: ['300', '400', '500', '600', '700'],
+//   display: 'swap',
+// })
+
+// export const metadata: Metadata = {
+//   title: 'AUREA Lab – Extensions de cils haut de gamme | Ouverture bientôt',
+//   description: 'AUREA Lab est un futur studio spécialisé dans les extensions de cils haut de gamme à Antananarivo. Ouverture bientôt – rejoignez la liste d\'attente.',
+// }
+
+// export default function RootLayout({
+//   children,
+// }: {
+//   children: React.ReactNode
+// }) {
+//   return (
+//     <html lang="fr">
+//       <body className={spaceGrotesk.className}>{children}</body>
+//     </html>
+//   )
+// }
+
 import type { Metadata } from 'next'
+import { Space_Grotesk, Playfair_Display, Italiana } from 'next/font/google'
 import './globals.css'
+import './styles/utilities.css'
+import './styles/components.css'
+import './styles/pages.css'
+import './styles/admin.css'
+
+
+
+// Configuration des polices
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-space-grotesk',  // Variable CSS pour Space Grotesk
+})
+
+const playfair = Playfair_Display({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  variable: '--font-playfair',  // Variable CSS pour Playfair Display
+})
+
+const italiana = Italiana({ 
+  subsets: ['latin'],
+  weight: ['400'],
+  display: 'swap',
+  variable: '--font-italiana',  // Variable CSS pour Playfair Display
+})
 
 export const metadata: Metadata = {
   title: 'AUREA Lab – Extensions de cils haut de gamme | Ouverture bientôt',
-  description: 'AUREA Lab est un futur studio spécialisé dans les extensions de cils haut de gamme à Antananarivo. Ouverture bientôt – rejoignez la liste d\'attente.',
+  description: 'AUREA Lab est un futur studio spécialisé dans les extensions de cils haut de gamme à Antananarivo.',
+  openGraph: {
+    title: 'AUREA Lab - Le luxe dans chaque regard',
+    description: 'Studio d\'extensions de cils haut de gamme à Antananarivo',
+    url: 'https://aurealab.com',
+    siteName: 'AUREA Lab',
+    images: [
+      {
+        url: 'https://aurealab.com/og-image.jpg',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'fr_FR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AUREA Lab',
+    description: 'Extensions de cils haut de gamme',
+    images: ['https://aurealab.com/og-image.jpg'],
+  },
+  alternates: {
+    canonical: 'https://aurealab.com',
+  },
+  icons: {
+    icon: '/favicon.png?v=2',
+  },
 }
 
 export default function RootLayout({
@@ -45,7 +148,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
+    <html lang="fr" className={`${spaceGrotesk.variable} ${italiana.variable}`}>
       <body>{children}</body>
     </html>
   )

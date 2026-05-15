@@ -8,9 +8,28 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  images: {
+    // Autorise les images depuis votre compte Cloudinary
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/degalhtre/**', // Remplacez "degalhtre" par votre vrai "cloud name"
+        search: '',
+      },
+    ],
+  },
+
+  rewrites: async () => {
+    return [
+      {
+        source: '/admin/api/:path*',
+        destination: '/api/:path*',
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
-module.exports = {
-  output: 'standalone',  // Indispensable pour Railway
-}

@@ -147,7 +147,7 @@ export default function Contact() {
                     </div>
                     <div className="contact-info-content">
                       <div className="contact-info-label">Instagram</div>
-                      <a href="https://instagram.com/lab.aurea" target="_blank" rel="noopener noreferrer" className="contact-info-value">
+                      <a href="https://www.instagram.com/lab.aurea/" target="_blank" rel="noopener noreferrer" className="contact-info-value">
                         @lab.aurea
                       </a>
                     </div>
@@ -161,8 +161,8 @@ export default function Contact() {
                     </div>
                     <div className="contact-info-content">
                       <div className="contact-info-label">Email</div>
-                      <a href="mailto:contact@aurealab.com" className="contact-info-value">
-                        contact@aurealab.com
+                      <a href="mailto:aurealab25@gmail.com" className="contact-info-value">
+                        aurealab25@gmail.com
                       </a>
                     </div>
                   </li>
@@ -215,9 +215,11 @@ export default function Contact() {
                   <button 
                     type="submit" 
                     disabled={isLoading}
+                    className='btn-gold'
                     style={{
-                      background: 'linear-gradient(135deg, #D4AF37 0%, #C59B27 100%)',
+                      // background: 'linear-gradient(135deg, #D4AF37 0%, #C59B27 100%)',
                       color: '#1A1A1A',
+                      justifyContent: 'center',
                       padding: '0.875rem 2rem',
                       borderRadius: '9999px',
                       width: '100%',
@@ -227,7 +229,7 @@ export default function Contact() {
                       opacity: isLoading ? 0.6 : 1
                     }}
                   >
-                    {isLoading ? '⏳ Envoi en cours...' : '✉️ Envoyer le message'}
+                    {isLoading ? 'Envoi en cours...' : 'Envoyer le message'}
                   </button>
                 </form>
               </div>

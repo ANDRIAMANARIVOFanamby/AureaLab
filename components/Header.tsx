@@ -14,6 +14,7 @@ export default function Header() {
     { href: '/gallery', label: 'Galerie' },
     { href: '/booking', label: 'Réservation' },
     { href: '/contact', label: 'Contact' },
+    { href: '/blog', label: 'Blog' },
   ]
 
   return (
@@ -27,7 +28,7 @@ export default function Header() {
               width={0}
               height={0}
               sizes="100vw"
-              style={{ width: 'auto', height: '50px' }}
+              style={{ width: 'auto', height: '4vw' }}
               className="object-contain"
               priority
             />

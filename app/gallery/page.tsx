@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import Image from 'next/image'
+import ScrollArrow from '@/components/ScrollArrow'
 
 interface GalleryImage {
   id: number
@@ -97,18 +99,34 @@ export default function Gallery() {
       <main>
         
         {/* Section Galerie */}
-        <section className="gallery-page">
-          <div className="gallery-container">
             
             {/* Hero */}
-            <div className="gallery-hero">
-              <h1>Nos créations</h1>
-              <div className="gallery-divider"></div>
-              <p>
-                Découvrez l'univers AUREA Lab à travers des créations de regard élégantes et précises.
-                Chaque pose est réalisée avec soin pour un résultat harmonieux et sophistiqué.
-              </p>
+            <div className="gallery-hero" style={{ height: '100vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
+                <Image 
+                  src="/hero-bg.jpg" 
+                  alt="AUREA Lab"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)' }}></div>
+              </div>
+              <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center', width: '100%' }}>
+                <h1>Nos créations</h1>
+                <div className="gallery-divider"></div>
+                <p>
+                  Découvrez l'univers AUREA Lab à travers des créations de regard élégantes et précises.
+                  Chaque pose est réalisée avec soin pour un résultat harmonieux et sophistiqué.
+                </p>
+                {/* Indicateur de scroll - Flèche dans un rond à gauche */}
+                <div style={{ position: 'absolute', bottom: '2rem', right: '2rem', zIndex: 20 }}>
+                  <ScrollArrow />
+                </div>
+              </div>
             </div>
+        <section className="gallery-page">
+          <div className="gallery-container">
 
             {/* Filtres par catégorie */}
             {images.length > 0 && (

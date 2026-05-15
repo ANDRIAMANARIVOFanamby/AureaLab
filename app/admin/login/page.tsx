@@ -52,7 +52,7 @@ export default function AdminLogin() {
         boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", color: '#D4AF37', marginBottom: '0.5rem' }}>AUREA Lab</h1>
+          <h1 style={{ color: '#D4AF37', marginBottom: '0.5rem' }}>AUREA Lab</h1>
           <p style={{ color: '#666' }}>Administration</p>
         </div>
 
@@ -104,7 +104,7 @@ export default function AdminLogin() {
         </form>
 
         <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.75rem', color: '#999' }}>
-          Identifiant: admin / Mot de passe: aurealab2024
+          Veuillez vous renseigner aupres de l'adminnistrateur
         </p>
       </div>
     </div>

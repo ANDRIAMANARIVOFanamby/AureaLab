@@ -21,9 +21,33 @@ export async function POST(request: NextRequest) {
     // Validation
     if (!nom || !email || !telephone || !prestation) {
       return NextResponse.json(
-        { error: 'Champs manquants' },
+        { error: 'Tous les champs obligatoires doivent être remplis' },
         { status: 400 }
       )
+    }
+
+    // Récupérer le nom et le prix de la prestation depuis la base
+    let prestationLabel = ''
+    let serviceName = ''
+    let servicePrice = ''
+
+    if (prestation === 'non-sure') {
+      prestationLabel = 'Je ne sais pas encore'
+      serviceName = 'Non spécifié'
+      servicePrice = ''
+    } else {
+      // Chercher le service dans la base
+      const service = await prisma.service.findUnique({
+        where: { id: prestation }
+      })
+      
+      if (service) {
+        serviceName = service.name
+        servicePrice = service.price
+        prestationLabel = `${service.name} - ${service.price}`
+      } else {
+        prestationLabel = prestation // Fallback
+      }
     }
 
     // 1. Sauvegarde dans PostgreSQL
@@ -32,22 +56,13 @@ export async function POST(request: NextRequest) {
         nom,
         email,
         telephone,
-        prestation,
+        prestation: prestationLabel,
         disponibilite: disponibilite || '',
         message: message || '',
       },
     })
 
-    // 2. Mapping des prestations
-    const prestationLabels: Record<string, string> = {
-      'cil-a-cil': 'Cil à cil - 60 000 Ar',
-      'hybride': 'Hybride - 70 000 Ar',
-      'volume-bresilien': 'Volume Brésilien - 80 000 Ar',
-      'megavolume': 'Mégavolume - 100 000 Ar',
-      'non-sure': 'Je ne sais pas encore',
-    }
-
-    // 3. Envoi d'email
+    // 2. Envoi d'email
     const emailHtml = `
       <!DOCTYPE html>
       <html>
@@ -76,26 +91,26 @@ export async function POST(request: NextRequest) {
               <span>${nom}</span>
             </div>
             <div class="field">
-              <span class="label">📧 Email :</span>
+              <span class="label">Email :</span>
               <span>${email}</span>
             </div>
             <div class="field">
-              <span class="label">📱 Téléphone :</span>
+              <span class="label">Téléphone :</span>
               <span>${telephone}</span>
             </div>
             <div class="field">
-              <span class="label">💎 Prestation :</span>
-              <span>${prestationLabels[prestation] || prestation}</span>
+              <span class="label">Prestation :</span>
+              <span>${prestationLabel}</span>
             </div>
             ${disponibilite ? `
             <div class="field">
-              <span class="label">📅 Disponibilité :</span>
+              <span class="label">Disponibilité :</span>
               <span>${disponibilite}</span>
             </div>
             ` : ''}
             ${message ? `
             <div class="field">
-              <span class="label">💬 Message :</span>
+              <span class="label">Message :</span>
               <span>${message}</span>
             </div>
             ` : ''}
@@ -105,7 +120,7 @@ export async function POST(request: NextRequest) {
           </div>
           <div class="footer">
             <p>AUREA Lab - Le luxe dans chaque regard</p>
-            <p style="font-size: 11px;">📅 ${new Date().toLocaleString('fr-FR')}</p>
+            <p style="font-size: 11px;">${new Date().toLocaleString('fr-FR')}</p>
           </div>
         </div>
       </body>
@@ -134,7 +149,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Erreur:', error)
     return NextResponse.json(
-      { error: 'Erreur serveur' },
+      { error: 'Erreur serveur lors de l\'inscription' },
       { status: 500 }
     )
   }
